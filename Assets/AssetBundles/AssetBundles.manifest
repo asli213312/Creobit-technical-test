@@ -1,0 +1,7 @@
+ManifestFileVersion: 0
+CRC: 3198509394
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: minigame_clicker
+      Dependencies: {}

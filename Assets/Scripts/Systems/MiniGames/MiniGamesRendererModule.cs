@@ -1,35 +1,68 @@
 using System;
+using System.Collections;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 
+[Serializable]
 public class MiniGamesRendererModule : MonoBehaviour, IMiniGamesRendererModule
 {
     [SerializeField] private MiniGameLaunchButton[] miniGameButtons;
+    [SerializeField] private Button closeGameButton;
+
+    [Header("Events")]
+    [SerializeField] private UnityEvent onSpawnMiniGame;
+    [SerializeField] private UnityEvent onCloseMiniGame;
 
     private Action<AbstractMiniGameData> OnSelectedData;
+    private AbstractMiniGameTypeView _currentMiniGame;
     private MiniGamesSystem _system;
+
+    private void Awake() 
+    {
+        foreach (var item in miniGameButtons)
+        {
+            item.OnClick += RenderSelectedMiniGame;
+        }
+
+        closeGameButton.onClick.AddListener(CloseCurrentMiniGame);
+    }
+
+    private void OnDestroy()
+    {
+        foreach (var item in miniGameButtons)
+        {
+            item.OnClick -= RenderSelectedMiniGame;
+        }
+
+        closeGameButton.onClick.RemoveListener(CloseCurrentMiniGame);
+    }
 
     public void InitializeCore(MiniGamesSystem system) 
     {
         _system = system;
     }
 
-    public void RenderSelectedMiniGame(AbstractMiniGameData data) 
+    public void RenderSelectedMiniGame(AbstractMiniGameTypeView view) 
     {
-        data.view.Create(data);
+        view.Create();
+        onSpawnMiniGame?.Invoke();
+
+        _currentMiniGame = view;
     }
 
-    private void SelectMiniGameByData(AbstractMiniGameData selectedData) 
+    private void CloseCurrentMiniGame() 
     {
-        AbstractMiniGameData foundData = _system.Config.miniGames.FirstOrDefault(x => x == selectedData);
+        if (_currentMiniGame.GameInstance != null)
+            Destroy(_currentMiniGame.GameInstance.gameObject);
 
-        if (foundData == null) 
+        foreach (var gameButton in miniGameButtons)
         {
-            Debug.LogError("Couldn't find data by selected launch button. Selected data name: " + selectedData.name, selectedData);
-            return;
+            this.Activate(gameButton.transform);
         }
 
-        OnSelectedData?.Invoke(foundData);
+        _currentMiniGame = null;
+        onCloseMiniGame?.Invoke();
     }
 }

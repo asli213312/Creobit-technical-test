@@ -1,13 +1,13 @@
 using UnityEngine;
 
 [RequireComponent(typeof(IMiniGamesRendererModule))]
-public class MiniGamesSystem : MonoBehaviour, ISystem
+public sealed class MiniGamesSystem : MonoBehaviour, ISystem
 {
     [Header("Data")]
     [SerializeField] private MiniGamesConfig config;
 
     [Header("Modules")]
-    [SerializeField, SerializeReference] private IMiniGamesRendererModule rendererModule;
+    [SerializeReference, SerializeField] private MiniGamesRendererModule rendererModule;
 
     public MiniGamesConfig Config => config;
     public IMiniGamesRendererModule RendererModule => rendererModule;
