@@ -50,8 +50,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12556bcd653a864499abbab247224ea3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  assets:
-  - blue_button
+  assetContainers:
+  - type: 0
+    name: blue_button
+    targetObj: {fileID: 5448163197369711111}
   data: {fileID: 11400000, guid: bbd70f2b1dd1e3441b1a82db41e6b969, type: 2}
   button: {fileID: 7604783510551093714}
   counterText: {fileID: 1917279912451078897}

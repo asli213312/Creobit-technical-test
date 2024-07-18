@@ -57,6 +57,17 @@ public class Menu : MonoBehaviour
         StartCoroutine(_selectedPanel.transform.DoLocalScaleAndUnscale(this, new Vector3(scaleValue, scaleValue, scaleValue)));
     }
 
+    public void ScaleAndUnscaleSelectedUI(float scaleValue)
+    {
+        if (_selectedPanel == null)
+        {
+            Debug.LogWarning("Select panel to upscale!");
+            return;
+        }
+
+        StartCoroutine(_selectedPanel.GetComponent<RectTransform>().DoLocalScaleAndUnscale(this, new Vector3(scaleValue, scaleValue, scaleValue), true, 3f));
+    }
+
     public void AlphaClosePanel(Graphic graphic)
     {
         Color color = graphic.color;

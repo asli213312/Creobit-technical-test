@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public abstract class AbstractMiniGameTypeView : MonoBehaviour
@@ -19,12 +20,15 @@ public abstract class AbstractMiniGameTypeView : MonoBehaviour
         CheckLoadedAssets();
     }
 
-    public void Create() 
+    public void Create(MiniGameServices services) 
     {
-        Prepare(MiniGameView);
+        Prepare(MiniGameView, (miniGameView) => 
+            {
+                miniGameView.Initialize(services);
+            });
     }
 
-    protected abstract void Prepare(AbstractMiniGameView miniGameView);
+    protected abstract void Prepare(AbstractMiniGameView miniGameView, System.Action<AbstractMiniGameView> onCreated);
 
     private void CheckLoadedAssets() 
     {
@@ -38,7 +42,7 @@ public abstract class AbstractMiniGameTypeView : MonoBehaviour
         {
             bool found = false;
 
-            foreach (var assetName in MiniGameView.Assets)
+            foreach (var assetName in MiniGameView.AssetContainers.Select(x => x.name).ToArray())
             {
                 if (loadedAsset.name != assetName) continue;
 

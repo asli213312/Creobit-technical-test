@@ -99,6 +99,58 @@ public static class Helper
         }
     }
 
+    public static IEnumerator DoLocalScaleAndUnscale(this RectTransform rectTransform, MonoBehaviour behaviour,
+        Vector3 scale, bool needDeactivate = false, float deactivateAfter = 0, UnityAction onComplete = null)
+    {
+        behaviour.Activate(rectTransform);
+        
+        Vector3 initScale = rectTransform.localScale;
+        Vector3 initPosition = rectTransform.anchoredPosition;
+
+        behaviour.StartCoroutine(LocalScale(rectTransform, scale));
+
+        onComplete?.Invoke();
+        
+        if (needDeactivate)
+        {
+            rectTransform.anchoredPosition = Vector3.one * 100;
+            yield return new WaitForSeconds(deactivateAfter);
+            ReturnScale();
+        }
+        else
+        {
+            yield return new WaitUntil(() => rectTransform.gameObject.activeSelf == false);
+            rectTransform.anchoredPosition = Vector3.one * 100;
+            behaviour.Activate(rectTransform);
+            ReturnScale();
+        }
+
+        void ReturnScale()
+        {
+            behaviour.StartCoroutine(LocalScale(rectTransform, initScale,
+                () =>
+                {
+                    behaviour.Deactivate(rectTransform);
+                    rectTransform.anchoredPosition = initPosition;
+                }));
+        }
+
+        IEnumerator LocalScale(Transform currentTransform, Vector3 endScale, UnityAction onCompleteScale = null)
+        {
+            Vector3 startScale = currentTransform.localScale;
+            float t = Time.deltaTime;
+            while (t < 0.1f)
+            {
+                currentTransform.localScale = Vector3.Lerp(startScale, endScale, t / 0.1f);
+                yield return null;
+                t += Time.deltaTime;
+            }
+
+            currentTransform.localScale = endScale;
+            onCompleteScale?.Invoke();
+        }
+    }
+
     public static IEnumerator DoRotation(this Transform transform, Quaternion targetRotation, Action onComplete)
     {
         Quaternion startRotation = transform.localRotation;

@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Clicker
   m_EditorClassIdentifier: 
   assetBundleName: minigame_clicker
-  useSceneView: 1
+  useSceneView: 0
   blank:
     m_Handle: 0

@@ -12,5 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7323c93bb4672244f9fce85f5a4e84fc, type: 3}
   m_Name: Runner
   m_EditorClassIdentifier: 
-  view: {fileID: 0}
-  assetBundlePath: 
+  assetBundleName: minigame_runner
+  useSceneView: 0
+  blank:
+    m_Handle: 0
+  moveSpeed: 3
+  mouseSensitivity: 60

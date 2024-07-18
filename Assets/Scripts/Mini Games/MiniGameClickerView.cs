@@ -25,7 +25,11 @@ public class MiniGameClickerView : AbstractMiniGameView
 
         button.onClick.AddListener(OnClick);
 
-        _counter = PlayerPrefs.GetInt(Constants.MiniGamesPrefs.CLICKER_PREFS);
+        if (PlayerPrefs.HasKey(Constants.MiniGamesPrefs.CLICKER_PREFS)) 
+        {
+            _counter = PlayerPrefs.GetInt(Constants.MiniGamesPrefs.CLICKER_PREFS);
+        }
+
         UpdateText();
     }
 

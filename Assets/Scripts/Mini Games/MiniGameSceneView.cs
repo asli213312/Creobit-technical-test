@@ -9,15 +9,15 @@ public class MiniGameSceneView : AbstractMiniGameTypeView
     [Header("Additional data")]
     [SerializeField] private string miniGameSceneName;
 
-    protected override void Prepare(AbstractMiniGameView miniGameView) 
+    protected override void Prepare(AbstractMiniGameView miniGameView, System.Action<AbstractMiniGameView> onCreated) 
     {
         SceneManager.LoadScene(miniGameSceneName);
-        SceneManager.sceneLoaded += OnSceneLoaded;
+        SceneManager.sceneLoaded += (newScene, mode) => OnSceneLoaded(newScene, mode, onCreated);
     }
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode) 
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode, System.Action<AbstractMiniGameView> onCreated) 
     {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
+        SceneManager.sceneLoaded -= (newScene, mode) => OnSceneLoaded(newScene, mode, onCreated);
 
         AbstractMiniGameView view = FindObjectOfType(MiniGameView.GetType()) as AbstractMiniGameView;
         if (view == null) 
@@ -26,6 +26,7 @@ public class MiniGameSceneView : AbstractMiniGameTypeView
             return;
         }
 
+        onCreated?.Invoke(view);
         view.Render(view.MiniGameData, LoadedAssets);
 
         GameInstance = view;

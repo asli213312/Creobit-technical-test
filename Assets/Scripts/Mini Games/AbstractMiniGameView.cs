@@ -4,11 +4,18 @@ using UnityEngine;
 
 public abstract class AbstractMiniGameView : MonoBehaviour
 {
-    [SerializeField] private string[] assets;
-    public string[] Assets => assets;
+    [SerializeField] private AssetContainer[] assetContainers;
+
+    public AssetContainer[] AssetContainers => assetContainers;
     public AbstractMiniGameData MiniGameData => Data;
+    public List<UnityEngine.Object> LoadedAssets { get; private set;} = new();
     protected abstract AbstractMiniGameData Data { get; set; }
-    protected List<UnityEngine.Object> LoadedAssets = new();
+    protected MiniGameServices Services { get; private set; }
+
+    public void Initialize(MiniGameServices services) 
+    {
+        Services = services;
+    }
 
     public void Render(AbstractMiniGameData data, List<UnityEngine.Object> assets) 
     {
@@ -27,40 +34,26 @@ public abstract class AbstractMiniGameView : MonoBehaviour
     protected T GetAssetFromLoaded<T>() where T : UnityEngine.Object
     {
         foreach (var asset in LoadedAssets)
-        {
-            UnityEngine.Object requestedAsset = null;
-            
-            foreach (var assetName in Assets)
-            {
-                if (assetName != asset.name) continue;
+        {           
+            AssetContainer selectedAssetContainer = null;
 
-                requestedAsset = asset;
+            foreach (var assetContainer in assetContainers)
+            {
+                if (assetContainer.name != asset.name) continue;
+
+                selectedAssetContainer = assetContainer;
                 Debug.Log("Asset founded! for: " + name, gameObject);
-                Debug.Log("Asset name: " + requestedAsset.name);
-                Debug.Log("Asset type: " + requestedAsset.GetType());
+                Debug.Log("Asset name: " + asset.name);
+                Debug.Log("Asset type: " + asset.GetType());
             }
 
-            if (requestedAsset == null) 
+            if (selectedAssetContainer == null) 
             {
                 Debug.LogError("Couldn't find from loaded assets requested asset");
-                break;
+                return null;
             }
 
-            switch(requestedAsset) 
-            {
-                case Texture2D:
-                    Texture2D texture = requestedAsset as Texture2D;
-                
-                    Sprite selectedSprite = Sprite.Create(
-                        texture, 
-                        new Rect(0, 0, texture.width, texture.height), 
-                        new Vector2(0.5f, 0.5f)
-                    );
-
-                    return selectedSprite as T;
-                default: 
-                    return requestedAsset as T;
-            }
+            return Services.AssetResolver.ResolveAsset<T>(selectedAssetContainer.type, asset) as T;
         }
 
         Debug.LogError("Couldn't find from loaded assets requested asset");

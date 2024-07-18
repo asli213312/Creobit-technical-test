@@ -4,6 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
+public class AssetLoadException : Exception
+{
+    public AssetLoadException(string message) : base(message) { }
+    public AssetLoadException(string message, Exception innerException) : base(message, innerException) { }
+}
+
 public class AssetBundleManager : MonoBehaviour
 {
     public static AssetBundleManager Instance { get; private set; }
@@ -23,15 +29,24 @@ public class AssetBundleManager : MonoBehaviour
         }
     }
 
-    public IEnumerator LoadAssetBundle(string bundleUrl, string bundleName, Action<AssetBundle> onComplete)
+    public IEnumerator LoadAssetBundle(string bundleUrl, string bundleName, Action<AssetBundle> onComplete, Action<Exception> onError)
     {
         Debug.Log($"Start loading AssetBundle: {bundleName} from {bundleUrl}");
 
+        Exception caughtException = null;
+
         if (_loadedBundles.ContainsKey(bundleName))
         {
-            Debug.Log($"AssetBundle {bundleName} already loaded.");
-            onComplete?.Invoke(_loadedBundles[bundleName]);
-            yield break;
+            caughtException = new AssetLoadException($"AssetBundle {bundleName} already loaded.");
+            onError?.Invoke(caughtException);
+            throw caughtException;
+        }
+
+        if (Application.internetReachability == NetworkReachability.NotReachable)
+        {
+            caughtException = new AssetLoadException("No internet connection available.");
+            onError?.Invoke(caughtException);
+            throw caughtException;
         }
 
         using (UnityWebRequest www = UnityWebRequestAssetBundle.GetAssetBundle(bundleUrl))
@@ -40,33 +55,70 @@ public class AssetBundleManager : MonoBehaviour
 
             if (www.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError($"Failed to load AssetBundle: {www.error}");
-                yield break;
+                caughtException = new AssetLoadException($"Failed to load AssetBundle: {www.error}");
+                onError?.Invoke(caughtException);
+                throw caughtException;
             }
 
-            AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(www);
-            
-            if (bundle == null)
+            try
             {
-                Debug.LogError($"Failed to get AssetBundle content from {bundleUrl}");
-                yield break;
-            }
+                AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(www);
 
-            _loadedBundles[bundleName] = bundle;
-            Debug.Log($"Successfully loaded AssetBundle: {bundleName}");
-            onComplete?.Invoke(bundle);
+                if (bundle == null)
+                {
+                    throw new AssetLoadException($"Failed to get AssetBundle content from {bundleUrl}");
+                }
+
+                _loadedBundles[bundleName] = bundle;
+                Debug.Log($"Successfully loaded AssetBundle: {bundleName}");
+                onComplete?.Invoke(bundle);
+            }
+            catch (Exception e)
+            {
+                caughtException = new Exception($"Exception during loading AssetBundle: {e.Message}");
+                onError?.Invoke(caughtException);
+            }
         }
     }
 
-    public T GetAsset<T>(string bundleName, string assetName) where T : UnityEngine.Object
+    public IEnumerator LoadAsyncAssetsFromBundle(string bundleName, string[] assetNames, Action<List<UnityEngine.Object>> onComplete, Action<Exception> onError)
     {
-        if (_loadedBundles.ContainsKey(bundleName))
+        Exception caughtException = null;
+
+        if (!_loadedBundles.ContainsKey(bundleName))
         {
-            return _loadedBundles[bundleName].LoadAsset<T>(assetName);
+            caughtException = new AssetLoadException($"AssetBundle {bundleName} not loaded.");
+            throw caughtException;
         }
 
-        Debug.LogError("AssetBundle not loaded: " + bundleName);
-        return null;
+        AssetBundle bundle = _loadedBundles[bundleName];
+        List<UnityEngine.Object> loadedAssets = new List<UnityEngine.Object>();
+
+        foreach (var assetName in assetNames)
+        {
+            AssetBundleRequest request = bundle.LoadAssetAsync<UnityEngine.Object>(assetName);
+            yield return request;
+
+            try
+            {
+                if (request.asset != null)
+                {
+                    loadedAssets.Add(request.asset as UnityEngine.Object);
+                }
+                else
+                {
+                    throw new AssetLoadException($"Failed to load asset: {assetName} from bundle: {bundleName}");
+                }
+            }
+            catch (Exception e)
+            {
+                caughtException = new AssetLoadException($"Exception during loading asset: {assetName} from bundle: {bundleName}", e);
+                onError?.Invoke(caughtException);
+            }
+        }
+
+        onComplete?.Invoke(loadedAssets);
+
     }
 
     public void UnloadAssetBundle(string bundleName, bool unloadAllLoadedObjects, Action<bool> isUnloaded)

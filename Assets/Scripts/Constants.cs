@@ -5,6 +5,6 @@ public struct Constants
     public struct MiniGamesPrefs 
     {
         public const string CLICKER_PREFS = "clicker_prefs";
-        public const string RUNNER_PREFS = "runner_prefs";
+        public const string RUNNER_PREFS = "runner_best_time";
     }
 }

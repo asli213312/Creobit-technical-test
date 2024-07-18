@@ -1,5 +1,7 @@
 public enum AssetType 
 {
     Sprite,
-    Texture
+    Texture,
+    Material,
+    Mesh
 }
