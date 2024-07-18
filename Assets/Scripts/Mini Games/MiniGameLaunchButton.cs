@@ -46,7 +46,7 @@ public class MiniGameLaunchButton : MonoBehaviour
     {
         selectButton.onClick.RemoveListener(() => OnClick?.Invoke(miniGameTypeView));
         loadDataButton.onClick.RemoveListener(() => StartCoroutine(LoadData()));
-        unloadDataButton.onClick.AddListener(UnloadData);
+        unloadDataButton.onClick.RemoveListener(UnloadData);
     }
 
     private IEnumerator LoadData() 

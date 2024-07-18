@@ -51,18 +51,28 @@ public class MiniGameRunnerView : AbstractMiniGameView
 
     private void UpdateBestTime() 
     {
-        if (_stopWatch.ElapsedTime.TotalMilliseconds < PlayerPrefs.GetFloat(Constants.MiniGamesPrefs.RUNNER_PREFS)) 
-        {
-            PlayerPrefs.SetFloat(Constants.MiniGamesPrefs.RUNNER_PREFS, (float)_stopWatch.ElapsedTime.TotalMilliseconds);
-            Debug.Log("Runner best time updated");
-        }
-
         if (PlayerPrefs.HasKey(Constants.MiniGamesPrefs.RUNNER_PREFS)) 
         {
             float savedTotalMilliseconds = PlayerPrefs.GetFloat(Constants.MiniGamesPrefs.RUNNER_PREFS);
 
-            TimeSpan savedTimeSpan = TimeSpan.FromMilliseconds(savedTotalMilliseconds);
+            if (_stopWatch.ElapsedTime.TotalMilliseconds < savedTotalMilliseconds) 
+            {
+                PlayerPrefs.SetFloat(Constants.MiniGamesPrefs.RUNNER_PREFS, (float)_stopWatch.ElapsedTime.TotalMilliseconds);
+                Debug.Log("Runner best time updated");
+                savedTotalMilliseconds = (float)_stopWatch.ElapsedTime.TotalMilliseconds;
+            }
 
+            UpdateText(savedTotalMilliseconds);
+        }
+        else 
+        {
+            PlayerPrefs.SetFloat(Constants.MiniGamesPrefs.RUNNER_PREFS, (float)_stopWatch.ElapsedTime.TotalMilliseconds);
+            UpdateText((float)_stopWatch.ElapsedTime.TotalMilliseconds);
+        }
+
+        void UpdateText(float milliseconds) 
+        {
+            TimeSpan savedTimeSpan = TimeSpan.FromMilliseconds(milliseconds);
             bestTimeText.text = $"Best: {savedTimeSpan.Seconds:00}.{savedTimeSpan.Milliseconds:000}";
             this.Activate(bestTimeText.transform);
         }
