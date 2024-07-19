@@ -176,13 +176,13 @@ public static class Helper
         behaviour.StartCoroutine(DoDelayedBoolCall(delay, onComplete, boolParameter));
     }
 
-    static IEnumerator DoDelayedBoolCall(float delay, Action<bool> onComplete, bool boolParameter)
+    private static IEnumerator DoDelayedBoolCall(float delay, Action<bool> onComplete, bool boolParameter)
     {
         yield return new WaitForSeconds(delay);
         onComplete?.Invoke(boolParameter);
     }
 
-    static IEnumerator DoDelayedCall(float delay, Action onComplete)
+    private static IEnumerator DoDelayedCall(float delay, Action onComplete)
     {
         yield return new WaitForSeconds(delay);
         onComplete?.Invoke();

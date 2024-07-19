@@ -6,15 +6,22 @@ using UnityEngine.SceneManagement;
 
 public class MiniGameSceneView : AbstractMiniGameTypeView
 {
+    #region Serialized Fields
     [Header("Additional data")]
     [SerializeField] private string miniGameSceneName;
 
+    #endregion Serialized Fields
+
+    #region Protected Methods
     protected override void Prepare(AbstractMiniGameView miniGameView, System.Action<AbstractMiniGameView> onCreated) 
     {
         SceneManager.LoadScene(miniGameSceneName);
         SceneManager.sceneLoaded += (newScene, mode) => OnSceneLoaded(newScene, mode, onCreated);
     }
 
+    #endregion Protected Methods
+
+    #region Private Methods
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode, System.Action<AbstractMiniGameView> onCreated) 
     {
         SceneManager.sceneLoaded -= (newScene, mode) => OnSceneLoaded(newScene, mode, onCreated);
@@ -31,4 +38,6 @@ public class MiniGameSceneView : AbstractMiniGameTypeView
 
         GameInstance = view;
     }
+
+    #endregion Private Methods
 }

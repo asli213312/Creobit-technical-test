@@ -3,11 +3,18 @@ using System.Diagnostics;
 
 public class SimpleStopWatch
 {
+    #region Properties
     public bool IsRunning { get; private set; }
     public TimeSpan ElapsedTime => _stopwatch.Elapsed;
 
+    #endregion Properties
+
+    #region Private Fields
     private Stopwatch _stopwatch;
 
+    #endregion Private Fields
+
+    #region Public Methods
     public SimpleStopWatch()
     {
         _stopwatch = new Stopwatch();
@@ -31,4 +38,6 @@ public class SimpleStopWatch
         _stopwatch.Reset();
         IsRunning = false;
     }
+
+    #endregion Public Methods
 }

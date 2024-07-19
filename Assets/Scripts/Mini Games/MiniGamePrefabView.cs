@@ -2,9 +2,13 @@ using UnityEngine;
 
 public class MiniGamePrefabView : AbstractMiniGameTypeView
 {
+    #region Serialized Fields
     [Header("Additional data")]
     [SerializeField] private Transform spawnPoint;
 
+    #endregion Serialized Fields
+
+    #region Protected Methods
     protected override void Prepare(AbstractMiniGameView miniGameView, System.Action<AbstractMiniGameView> onCreated) 
     {
         AbstractMiniGameView view = Instantiate(miniGameView, spawnPoint);
@@ -15,4 +19,6 @@ public class MiniGamePrefabView : AbstractMiniGameTypeView
 
         GameInstance = view;
     }
+
+    #endregion Protected Methods
 }

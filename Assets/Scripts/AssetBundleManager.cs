@@ -12,10 +12,17 @@ public class AssetLoadException : Exception
 
 public class AssetBundleManager : MonoBehaviour
 {
+    #region Properties
     public static AssetBundleManager Instance { get; private set; }
 
+    #endregion Properties
+
+    #region Private Fields
     private Dictionary<string, AssetBundle> _loadedBundles = new Dictionary<string, AssetBundle>();
 
+    #endregion Private Fields
+
+    #region UnityLoop Events
     private void Awake()
     {
         if (Instance == null)
@@ -28,7 +35,10 @@ public class AssetBundleManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+    
+    #endregion UnityLoop Events
 
+    #region Public Methods
     public IEnumerator LoadAssetBundle(string bundleUrl, string bundleName, Action<AssetBundle> onComplete, Action<Exception> onError)
     {
         Debug.Log($"Start loading AssetBundle: {bundleName} from {bundleUrl}");
@@ -133,4 +143,6 @@ public class AssetBundleManager : MonoBehaviour
 
         isUnloaded?.Invoke(false);
     }
+
+    #endregion Public Methods
 }

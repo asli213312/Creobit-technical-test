@@ -10,19 +10,28 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Button))]
 public class MiniGameLaunchButton : MonoBehaviour
 {
+    #region Serialized Fields
     [SerializeField] private Button selectButton;
     [SerializeField] private Button loadDataButton;
     [SerializeField] private Button unloadDataButton;
     [SerializeField] private HorizontalLayoutGroup assetsPreviewLayout;
     [SerializeField] private Image assetPreviewPrefab;
     [SerializeField] private AbstractMiniGameTypeView miniGameTypeView;
+    #endregion Serialized Fields
 
+    #region Events
     public event Action OnSuccessLoad;
     public event Action OnFailedLoad;
     public event Action<AbstractMiniGameTypeView> OnClick;
+    #endregion Events
+
+    #region Private Fields
 
     private List<UnityEngine.Object> _loadedAssets = new();
 
+    #endregion Private Fields
+
+    #region UnityLoop Events
     private void Awake() 
     {
         selectButton.onClick.AddListener(() => OnClick?.Invoke(miniGameTypeView));
@@ -49,6 +58,9 @@ public class MiniGameLaunchButton : MonoBehaviour
         unloadDataButton.onClick.RemoveListener(UnloadData);
     }
 
+    #endregion UnityLoop Events
+
+    #region Private Methods
     private IEnumerator LoadData() 
     {
         loadDataButton.interactable = false;
@@ -79,7 +91,8 @@ public class MiniGameLaunchButton : MonoBehaviour
                 {
                     try 
                     {
-                        throw error;
+                        if (error != null)
+                            throw error;
                     }
                     catch (AssetLoadException e)
                     {
@@ -102,7 +115,8 @@ public class MiniGameLaunchButton : MonoBehaviour
             {
                 try 
                 {
-                    throw error;
+                    if (error != null)
+                        throw error;
                 }
                 catch (AssetLoadException e)
                 {
@@ -206,4 +220,6 @@ public class MiniGameLaunchButton : MonoBehaviour
             loadDataButton.interactable = true;
         }
     }
+
+    #endregion Private Methods
 }

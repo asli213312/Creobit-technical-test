@@ -4,7 +4,12 @@ using UnityEngine;
 
 public abstract class AbstractMiniGameView : MonoBehaviour
 {
+    #region Serialized Fields
     [SerializeField] private AssetContainer[] assetContainers;
+
+    #endregion Serialized Fields
+
+    #region Properties
 
     public AssetContainer[] AssetContainers => assetContainers;
     public AbstractMiniGameData MiniGameData => Data;
@@ -12,6 +17,9 @@ public abstract class AbstractMiniGameView : MonoBehaviour
     protected abstract AbstractMiniGameData Data { get; set; }
     protected MiniGameServices Services { get; private set; }
 
+    #endregion Properties
+
+    #region Public Methods
     public void Initialize(MiniGameServices services) 
     {
         Services = services;
@@ -29,6 +37,9 @@ public abstract class AbstractMiniGameView : MonoBehaviour
         OnRender(assets);
     }
 
+    #endregion Public Methods
+
+    #region Protected Methods
     protected abstract void OnRender(List<UnityEngine.Object> assets);
 
     protected T GetAssetFromLoaded<T>() where T : UnityEngine.Object
@@ -59,4 +70,6 @@ public abstract class AbstractMiniGameView : MonoBehaviour
         Debug.LogError("Couldn't find from loaded assets requested asset");
         return null;
     }
+
+    #endregion Protected Methods
 }

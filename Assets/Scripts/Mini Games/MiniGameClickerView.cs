@@ -7,6 +7,7 @@ using TMPro;
 
 public class MiniGameClickerView : AbstractMiniGameView
 {
+    #region Serialized Fields
     [Header("Data")]
     [SerializeField] private MiniGameClickerData data;
 
@@ -14,10 +15,29 @@ public class MiniGameClickerView : AbstractMiniGameView
     [SerializeField] private Button button;
     [SerializeField] private TextMeshProUGUI counterText;
 
+    #endregion Serialized Fields
+
+    #region Properties
     protected override AbstractMiniGameData Data { get => data; set => data = value as MiniGameClickerData; }
 
+    #endregion Properties
+
+    #region Private Fields
     private int _counter;
 
+    #endregion Private Fields
+
+    #region UnityLoop Events
+
+    private void OnDestroy()
+    {
+        button.onClick.RemoveListener(OnClick);
+        PlayerPrefs.SetInt(Constants.MiniGamesPrefs.CLICKER_PREFS, _counter);
+    }
+
+    #endregion UnityLoop Events
+
+    #region Protected Methods
     protected override void OnRender(List<UnityEngine.Object> assets) 
     {
         Image buttonGraphic = button.GetComponent<Image>();
@@ -33,12 +53,9 @@ public class MiniGameClickerView : AbstractMiniGameView
         UpdateText();
     }
 
-    private void OnDestroy()
-    {
-        button.onClick.RemoveListener(OnClick);
-        PlayerPrefs.SetInt(Constants.MiniGamesPrefs.CLICKER_PREFS, _counter);
-    }
+    #endregion Protected Methods
 
+    #region Private Methods
     private void OnClick() 
     {
         _counter++;
@@ -46,4 +63,6 @@ public class MiniGameClickerView : AbstractMiniGameView
     }
 
     private void UpdateText() => counterText.text = _counter.ToString();
+
+    #endregion Private Methods
 }

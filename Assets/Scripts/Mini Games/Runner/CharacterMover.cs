@@ -2,17 +2,27 @@ using UnityEngine;
 
 public class CharacterMover : MonoBehaviour
 {
+    #region Serialized Fields
     [SerializeField] private Transform target;
     [SerializeField] private Transform cameraTransform;
     [SerializeField] private float rotationSpeed;
 
+    #endregion Serialized Fields
+
+    #region Private Fields
     private float _moveSpeed;
 
+    #endregion Private Fields
+
+    #region Public Methods
     public void Initialize(float moveSpeed) 
     {
         _moveSpeed = moveSpeed;
     }
 
+    #endregion Public Methods
+
+    #region UnityLoop Events
     private void Update() 
     {
         float moveX = Input.GetAxis("Horizontal");
@@ -40,4 +50,6 @@ public class CharacterMover : MonoBehaviour
             target.rotation = Quaternion.Slerp(target.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         }
     }
+
+    #endregion UnityLoop Events
 }

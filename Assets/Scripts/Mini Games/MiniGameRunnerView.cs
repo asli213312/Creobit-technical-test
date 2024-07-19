@@ -7,6 +7,7 @@ using TMPro;
 
 public class MiniGameRunnerView : AbstractMiniGameView
 {
+    #region Serialized Fields
     [Header("Data")]
     [SerializeField] private MiniGameRunnerData data;
 
@@ -22,10 +23,27 @@ public class MiniGameRunnerView : AbstractMiniGameView
 
     [Header("Events")]
     [SerializeField] private UnityEvent onFinish;
+    #endregion Serialized Fields
+    
+    #region Properties
     protected override AbstractMiniGameData Data { get => data; set => data = value as MiniGameRunnerData; }
 
+    #endregion Properties
+
+    #region Private Fields
     private SimpleStopWatch _stopWatch;
 
+    #endregion Private Fields
+
+    #region UnityLoop Events
+    private void OnDestroy() 
+    {
+        collisionChecker.OnCollide -= OnFinish;
+    }
+
+    #endregion UnityLoop Events
+
+    #region Protected Methods
     protected override void OnRender(List<UnityEngine.Object> assets) 
     {
         mover.Initialize(data.moveSpeed);
@@ -39,6 +57,9 @@ public class MiniGameRunnerView : AbstractMiniGameView
         _stopWatch.Start();
     }
 
+    #endregion Protected Methods
+
+    #region Private Methods
     private void OnFinish() 
     {
         onFinish?.Invoke();
@@ -78,8 +99,5 @@ public class MiniGameRunnerView : AbstractMiniGameView
         }
     }
 
-    private void OnDestroy() 
-    {
-        collisionChecker.OnCollide -= OnFinish;
-    }
+    #endregion Private Methods
 }

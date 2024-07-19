@@ -8,6 +8,7 @@ using UnityEngine.Events;
 [Serializable]
 public class MiniGamesRendererModule : MonoBehaviour, IMiniGamesRendererModule
 {
+    #region Serialized Fields
     [SerializeField] private MiniGameLaunchButton[] miniGameButtons;
     [SerializeField] private Button closeGameButton;
 
@@ -17,11 +18,16 @@ public class MiniGamesRendererModule : MonoBehaviour, IMiniGamesRendererModule
     [SerializeField] private UnityEvent onSpawnMiniGame;
     [SerializeField] private UnityEvent onCloseMiniGame;
 
+    #endregion Serialized Fields
+
+    #region Private Fields
     private Action<AbstractMiniGameData> OnSelectMiniGame;
     private AbstractMiniGameTypeView _currentMiniGame;
     private MiniGamesSystem _system;
     private AssetResolver _assetResolver;
+    #endregion Private Fields
 
+    #region UnityLoop Events
     private void Awake() 
     {
         foreach (var item in miniGameButtons)
@@ -49,7 +55,9 @@ public class MiniGamesRendererModule : MonoBehaviour, IMiniGamesRendererModule
 
         _assetResolver = null;
     }
+    #endregion UnityLoop Events
 
+    #region Public Methods
     public void InitializeCore(MiniGamesSystem system) 
     {
         _system = system;
@@ -64,7 +72,9 @@ public class MiniGamesRendererModule : MonoBehaviour, IMiniGamesRendererModule
 
         onSpawnMiniGame?.Invoke();
     }
+    #endregion Public Methods
 
+    #region Private Methods
     private void TryResolveAutomaticallyAssets()
     {
         foreach (var asset in _currentMiniGame.GameInstance.LoadedAssets)
@@ -172,4 +182,6 @@ public class MiniGamesRendererModule : MonoBehaviour, IMiniGamesRendererModule
         _currentMiniGame = null;
         onCloseMiniGame?.Invoke();
     }
+
+    #endregion Private Methods
 }
